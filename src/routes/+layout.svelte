@@ -1,5 +1,7 @@
 <script>
 	import Header from './Header.svelte';
+	import Counter from './Counter.svelte';
+	import Menu from './Menu.svelte';
 	import './styles.css';
 
 	import { fly } from 'svelte/transition';
@@ -10,63 +12,56 @@
 	import { Environment } from '@threlte/extras';
 
 	export let data;
+	$: console.log(data);
 </script>
 
-{#key data.pathname}
-	<div class="app">
-		<!-- <Header /> -->
+<!-- {#key data.pathname} -->
+<div class="app">
+	<!-- <Header /> -->
+	<!-- <Counter /> -->
 
-		<main
-			in:fly={{ easing: cubicOut, y: 10, duration: 300, delay: 400 }}
-			out:fly={{ easing: cubicIn, y: -10, duration: 300 }}
-		>
-			<Canvas>
-				<Environment path="images/" files="Space 4k.png" isBackground={true} />
-				<Scene />
-			</Canvas>
-			<slot />
-		</main>
+	<Canvas>
+		<Environment
+			path="images/"
+			files="Indoor Environment.hdr"
+			isBackground={false}
+		/>
+		<!-- <Environment path="images/" files="Bright Sky.hdr" isBackground={false} /> -->
+		<Scene navData={data} />
+	</Canvas>
 
-		<footer>
+	<main>
+		<slot />
+	</main>
+
+	<Menu />
+
+	<!-- <footer>
 			<p>visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit</p>
-		</footer>
-	</div>
-{/key}
+		</footer> -->
+</div>
+
+<!-- {/key} -->
 
 <style>
 	.app {
 		display: flex;
 		flex-direction: column;
-		min-height: 100vh;
+		width: 100vw;
+		height: 100vh;
 		/* background-color: red; */
 	}
 
 	main {
+		position: absolute;
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		padding: 1rem;
 		width: 100%;
-		max-width: 64rem;
+		/* max-width: 64rem; */
 		margin: 0 auto;
 		box-sizing: border-box;
-	}
-
-	footer {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		padding: 12px;
-	}
-
-	footer a {
-		font-weight: bold;
-	}
-
-	@media (min-width: 480px) {
-		footer {
-			padding: 12px 0;
-		}
+		padding: 20%;
+		/* background-color: green; */
 	}
 </style>
