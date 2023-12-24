@@ -2,16 +2,19 @@
 </script>
 
 <div id="frame">
-	<a class="button-container top left" href="/" draggable="false">
+	<a class="button-container home middle" href="/" draggable="false">
 		<div>Home</div>
 	</a>
-	<a class="button-container top right" href="/about" draggable="false">
+	<a class="button-container other top right" href="/other" draggable="false">
+		<div>Home</div>
+	</a>
+	<a class="button-container about top left" href="/about" draggable="false">
 		<div>About Me</div>
 	</a>
-	<a class="button-container bot left" href="/contact" draggable="false">
+	<a class="button-container contact bot right" href="/contact" draggable="false">
 		<div>Contact</div>
 	</a>
-	<a class="button-container bot right" href="/projects" draggable="false">
+	<a class="button-container projects bot left" href="/projects" draggable="false">
 		<div>Projects</div>
 	</a>
 </div>
@@ -20,11 +23,12 @@
 	#frame {
 		position: fixed;
 		display: grid;
-		grid-template-columns: 1fr 1fr;
-		grid-template-rows: 1fr 1fr;
+		grid-template-columns: 1fr 1fr 1fr;
+		grid-template-rows: 1fr 1fr 1fr;
 		grid-template-areas:
-			'top-left top-right'
-			'bot-left bot-right';
+			'about top-middle other'
+			'middle-left home middle-right'
+			'projects bot-middle contact';
 		width: 100%;
 		height: 100%;
 		/* pointer-events: none; */
@@ -42,7 +46,7 @@
 		/* justify-content: center;
 		align-items: center; */
 		transition: all 0.1s linear;
-        /* background-color: rgba(255,255,255,0.2); */
+		/* background-color: rgba(255,255,255,0.2); */
 	}
 
 	.button-container .active {
@@ -68,6 +72,28 @@
 	.right {
 		border-right: solid white 3px;
 		justify-content: end;
+	}
+
+	.middle {
+		border: solid white 3px;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.home {
+		grid-area: home;
+	}
+	.about {
+		grid-area: about;
+	}
+	.projects {
+		grid-area: projects;
+	}
+	.contact {
+		grid-area: contact;
+	}
+	.other {
+		grid-area: other;
 	}
 
 	a {

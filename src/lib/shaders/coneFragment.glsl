@@ -168,6 +168,9 @@ void main() {
     /* 
        Noise 
     */
+
+    float flowSpeed = 0.08;
+
     uint seed = 0x578437adU;
 
     float radius = 1.0 / TwoPI;
@@ -177,7 +180,7 @@ void main() {
     float zValue = vUvs.y;
     
     // Move over time
-    zValue += iTime * 0.1;
+    zValue += iTime * flowSpeed;
 
     // Calculate color
     float value = 0.0;
@@ -189,7 +192,7 @@ void main() {
     value = (value + 1.0) * 0.5;
 
     // Vignette color
-    value = mix(0.0, value, vUvs.y * 2.0);
+    value = mix(0.0, value, vUvs.y * 8.0);
 
     
     /* 

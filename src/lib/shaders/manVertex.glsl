@@ -1,6 +1,5 @@
 varying vec2 vUvs;
-
-uniform float rotation;
+varying vec2 vScreenPosition;
 
 void main() {
   vec4 localPosition = vec4(position, 1.0);
@@ -8,4 +7,5 @@ void main() {
 
   // Output
   vUvs = uv;
+  vScreenPosition = vec2(gl_Position.x, gl_Position.y);
 }

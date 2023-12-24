@@ -14,23 +14,38 @@
 		CubeCamera,
 		ShaderMaterial,
 		PointsMaterial,
-		Float32BufferAttribute
+		Float32BufferAttribute,
+		LineBasicMaterial,
+		Color,
+		LineSegments,
+		BufferGeometry,
+		DoubleSide,
+		AdditiveBlending
 	} from 'three';
 	import { useLoader, useThrelte } from '@threlte/core';
 	import { T, useFrame } from '@threlte/core';
 	import { interactivity, useGltf, GLTF, useTexture } from '@threlte/extras';
 	import { spring, tweened } from 'svelte/motion';
 
-	import fragmentShader from '$lib/shaders/fragment.glsl?raw';
-	import vertexShader from '$lib/shaders/vertex.glsl?raw';
+	import coneFragment from '$lib/shaders/coneFragment.glsl?raw';
+	import coneVertex from '$lib/shaders/coneVertex.glsl?raw';
+	import manFragment from '$lib/shaders/manFragment.glsl?raw';
+	import manVertex from '$lib/shaders/manVertex.glsl?raw';
 	import { writable } from 'svelte/store';
 	import { cubicInOut, elasticInOut } from 'svelte/easing';
 
 	export let navData;
 	$: console.log(navData);
 
-	const sphereGLTF = useGltf('models/Golden Sphere.glb');
-	const coneGLTF = useGltf('models/Cone.glb');
+	const sphereGLTF = useGltf('models/Portfolio Sphere.glb');
+	const coneGLTF = useGltf('models/Portfolio Cone.glb');
+	const manGLTF = useGltf('models/Portfolio Man.glb');
+	let manMesh;
+	// $: {
+	// 	if ($manGLTF)
+	// 		manMesh = $manGLTF.scene.children[0].children[0].children[0].children[0].children[0].geometry;
+	// }
+	$: console.log(manMesh);
 
 	interactivity();
 
@@ -38,13 +53,16 @@
 	const maxScale = 4;
 
 	const scale = spring(minScale);
+	const camera = writable();
 
 	let iTime = writable(0);
 
 	// Frame update
 	useFrame((state, delta) => {
 		iTime.update((n) => n + delta);
-		if (cubeCamera);
+		// console.log($camera);
+		// if ($coneGLTF) console.log($coneGLTF);
+		if ($coneGLTF) $coneGLTF.scene.lookAt($camera.position);
 	});
 
 	let cubeCamera;
@@ -56,23 +74,27 @@
 	let rainbowShader;
 	// $: console.log(rainbowShader);
 
-	let cameraPosition = tweened({ x: 0, y: 0 }, { duration: 500, easing: cubicInOut });
+	const zoomOut = 16;
+	const zoomIn = 8;
+	const traverseDist = 5;
+
+	let cameraPosition = tweened({ x: 0, y: 0, z: 0 }, { duration: 500, easing: cubicInOut });
 	$: {
 		switch (navData.pathname) {
 			case '/':
-				cameraPosition.set({ x: 0, y: 0 });
+				cameraPosition.set({ x: 0, y: 0, z: zoomOut });
 				break;
 			case '/about':
-				cameraPosition.set({ x: 1, y: 1 });
+				cameraPosition.set({ x: -traverseDist, y: traverseDist, z: zoomIn });
 				break;
 			case '/contact':
-				cameraPosition.set({ x: -1, y: -1 });
+				cameraPosition.set({ x: traverseDist, y: -traverseDist, z: zoomIn });
 				break;
 			case '/projects':
-				cameraPosition.set({ x: 1, y: -1 });
+				cameraPosition.set({ x: -traverseDist, y: -traverseDist, z: zoomIn });
 				break;
-			case '/':
-				cameraPosition.set({ x: 0, y: 0 });
+			case '/other':
+				cameraPosition.set({ x: traverseDist, y: traverseDist, z: zoomIn });
 				break;
 		}
 	}
@@ -84,9 +106,10 @@
 
 <T.PerspectiveCamera
 	makeDefault
-	position={[$cameraPosition.x, $cameraPosition.y, 8]}
+	position={[$cameraPosition.x, $cameraPosition.y, $cameraPosition.z]}
 	on:create={({ ref }) => {
 		ref.lookAt(0, 0, 0);
+		$camera = ref;
 	}}
 />
 
@@ -105,10 +128,12 @@
 
 <!-- <T.DirectionalLight position={[20, 0, 0]} castShadow /> -->
 <!-- <T.AmbientLight color={0xd7681c} intensity={0.1} /> -->
+
+<!-- Sphere -->
+
 <GLTF
 	bind:gltf={$sphereGLTF}
-	url="models/Golden Sphere.glb"
-	scale={0.75}
+	url="models/Portfolio Sphere.glb"
 	rotation.x={$iTime * 0.05}
 	rotation.y={$iTime * 0.1}
 	rotation.z={$iTime * 0.2}
@@ -121,30 +146,57 @@
 	}}
 />
 
+<!-- Man -->
+
+<GLTF
+	bind:gltf={$manGLTF}
+	url="models/Portfolio Man.glb"
+	on:create={(ref) => {
+		ref.ref.traverse((child) => {
+			if (child.isMesh) {
+				child.material.envMapIntensity = 0.3;
+				// child.material = wireFrameMaterial;
+				child.material.wireframe = true;
+			}
+		});
+	}}
+/>
+
+<!-- Wireframe man -->
+<!-- <T.LineSegments scale={10} position.y={-4} position.z={-1} rotation.x={Math.PI / 2}>
+	<T.WireframeGeometry args={[manMesh]} />
+	<T.ShaderMaterial
+		fragmentShader={manFragment}
+		vertexShader={manVertex}
+		uniforms={{
+			iTime: { value: 0 }
+		}}
+		uniforms.iTime.value={$iTime}
+		transparent={true}
+	/>
+</T.LineSegments> -->
+
 <!-- 
 		CONE MESH
  -->
 
 <GLTF
 	bind:gltf={$coneGLTF}
-	url="models/Cone.glb"
-	scale={1}
+	url="models/Portfolio Cone.glb"
 	on:create={(ref) => {
 		ref.ref.traverse((child) => {
 			if (child.isMesh) {
-				console.log(child);
 				child.material = rainbowShader;
 			}
 		});
 	}}
 >
 	<T.ShaderMaterial
+		side={BackSide}
 		bind:ref={rainbowShader}
-		{fragmentShader}
-		{vertexShader}
+		fragmentShader={coneFragment}
+		vertexShader={coneVertex}
 		uniforms={{
-			color1: { value: new Vector4(1, 1, 0, 1) },
-			color2: { value: new Vector4(0, 1, 1, 1) },
 			iTime: { value: 0 }
 		}}
 		uniforms.iTime.value={$iTime}

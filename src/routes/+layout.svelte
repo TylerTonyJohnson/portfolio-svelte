@@ -11,12 +11,19 @@
 	import Scene from './Scene.svelte';
 	import { Environment } from '@threlte/extras';
 
+
 	export let data;
 	$: console.log(data);
 </script>
 
+<svelte:head>
+	<title>Dare</title>
+	<meta name="About" content="About me" />
+</svelte:head>
+
 <!-- {#key data.pathname} -->
 <div class="app">
+	<!-- <img src='/images/space-background.jpg' /> -->
 	<!-- <Header /> -->
 	<!-- <Counter /> -->
 
@@ -50,6 +57,14 @@
 		width: 100vw;
 		height: 100vh;
 		/* background-color: red; */
+		/* background-image: '/images/space-background.jpg'; */
+	}
+
+	img {
+		position: absolute;
+		width: 100%;
+		/* height: 100%; */
+		/* z-index: -1; */
 	}
 
 	main {
